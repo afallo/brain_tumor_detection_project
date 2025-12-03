@@ -12,6 +12,7 @@ from tensorflow.keras.metrics import Recall
 from keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
 
+
 def initialize_model_with_aug():
     '''Instanciate and return the CNN architecture with light data augmentation'''
     
@@ -61,6 +62,7 @@ def initialize_model_with_aug():
     return model
 
 
+
 def compile_model(model):
     '''return a compiled model suited for the CIFAR-10 task'''
     model.compile(optimizer= 'adam',
@@ -73,9 +75,10 @@ model = initialize_model_with_aug()  # <-- utiliser la version avec augmentation
 model.summary()
 
 model = compile_model(model)
-es = EarlyStopping(patience=3, restore_best_weights=True)  # pyright: ignore[reportUndefinedVariable]
 
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=0)  # pyright: ignore[reportUndefinedVariable]
+es = EarlyStopping(patience=3, restore_best_weights=True)
+
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=0)
 
 history = model.fit(X_train, y_train,
                     epochs=10,
