@@ -8,6 +8,10 @@ Created on Tue Dec  2 14:55:02 2025
 import tensorflow as tf
 from tensorflow.keras import layers, Sequential
 from tensorflow.keras.layers import Input
+from tensorflow.keras.metrics import Recall
+from keras.callbacks import EarlyStopping
+from sklearn.model_selection import train_test_split
+
 
 def initialize_model_with_aug():
     '''Instanciate and return the CNN architecture with light data augmentation'''
@@ -58,7 +62,6 @@ def initialize_model_with_aug():
     return model
 
 
-from tensorflow.keras.metrics import Recall
 
 def compile_model(model):
     '''return a compiled model suited for the CIFAR-10 task'''
@@ -72,6 +75,7 @@ model = initialize_model_with_aug()  # <-- utiliser la version avec augmentation
 model.summary()
 
 model = compile_model(model)
+
 es = EarlyStopping(patience=3, restore_best_weights=True)
 
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=0)
