@@ -1,13 +1,13 @@
 raw_data/
 
-
+abir.DS_Store/
 brain/.DS_Store/
 raw_data/.DS_Store/
-
+notebooks/.DS_Store/
 .DS_Store/
 
 data/
-notebooks/.DS_Store/
 .python-version
+
 
 
