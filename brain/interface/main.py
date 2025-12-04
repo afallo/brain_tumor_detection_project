@@ -18,6 +18,8 @@ def preprocess() :
     training_df = load_path_label_df(TRAIN_DIR)
     testing_df = load_path_label_df(TEST_DIR)
 
+    #training_df = training_df.iloc[:DATA_SIZE]
+
     training_df_encoded = tumor_encoded(training_df)
     test_df_encoded = tumor_encoded(testing_df)
 
