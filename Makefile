@@ -19,3 +19,7 @@ run_evaluate:
 # run_all: run_preprocess run_train run_pred run_evaluate
 run_all:
 	python -c 'from brain.interface.main import main; main()'
+
+
+run_api:
+	uvicorn brain.api.fast:app --reload

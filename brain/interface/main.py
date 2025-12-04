@@ -8,12 +8,15 @@ from brain.params import *
 from brain.ml_logic.data import load_path_label_df
 from brain.ml_logic.encoders import tumor_encoded
 from brain.ml_logic.utils import find_and_erase_duplicates
-from brain.ml_logic.preprocess import load_process_image, pipeline_building
-from brain.ml_logic.model import init_model, compile_model
+from brain.ml_logic.preprocess import pipeline_building
+from brain.ml_logic.model import init_model, compile_model, init_densenet
+from brain.registry import load_model, save_results, save_model
 
 
 
 def preprocess() :
+
+    find_and_erase_duplicates()
 
     training_df = load_path_label_df(TRAIN_DIR)
     testing_df = load_path_label_df(TEST_DIR)
@@ -44,20 +47,31 @@ def train(train_ds, val_ds) :
 
     n_classes = len(np.unique(all_labels))
     input_shape = (TARGET_SIZE[0], TARGET_SIZE[1], 3)
-    model = init_model(input_shape, n_classes)
+    model = init_densenet(input_shape, n_classes)
     model = compile_model(model)
 
     es = [EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)]
 
     history = model.fit(train_ds,
                         validation_data=val_ds,
-                        epochs=10,
+                        epochs=1,
                         callbacks=es)
+
+
+    accuracy  = np.min(history.history['val_accuracy'])
+
+
+
+
+    save_results(metrics=dict(accuracy = accuracy))
+    save_model(model=model)
 
     return history, model
 
 def evaluate(model, test_ds) :
     print(model.evaluate(test_ds))
+
+
 
 def main() :
 

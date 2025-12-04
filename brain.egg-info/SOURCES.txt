@@ -3,6 +3,7 @@ setup.py
 brain/__init__.py
 brain/dedup_tumors.py
 brain/params.py
+brain/registry.py
 brain.egg-info/PKG-INFO
 brain.egg-info/SOURCES.txt
 brain.egg-info/dependency_links.txt
