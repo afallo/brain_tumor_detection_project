@@ -1,19 +1,26 @@
 import pandas as pd
 import numpy as np
-from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 
 
 from brain.params import *
+from brain.registry import load_model, save_results, save_model
+
 from brain.ml_logic_classification.data import load_path_label_df
 from brain.ml_logic_classification.encoders import tumor_encoded
 from brain.ml_logic_classification.utils import find_and_erase_duplicates
 from brain.ml_logic_classification.preprocess import pipeline_building
-from brain.ml_logic_classification.model import init_model_classification, compile_model_classification, init_densenet_classification
-from brain.registry import load_model, save_results, save_model
+from brain.ml_logic_classification.model import compile_model_classification, init_densenet_classification
+
+from brain.ml_logic_segmentation_2D.data import load_path_seg_df
+from brain.ml_logic_segmentation_2D.utils import find_and_erase_duplicates
+from brain.ml_logic_segmentation_2D.preprocess import ColorContrastDataGenerator
+from brain.ml_logic_segmentation_2D.model import compile_model_seg2D, init_model_seg2D
 
 
 
+#============= CLASSIFICATION===============================
 def preprocess_classification() :
 
     find_and_erase_duplicates()
@@ -54,7 +61,7 @@ def train_classification(train_ds, val_ds) :
 
     history = model.fit(train_ds,
                         validation_data=val_ds,
-                        epochs=1,
+                        epochs=20,
                         callbacks=es)
 
 
@@ -68,16 +75,101 @@ def train_classification(train_ds, val_ds) :
 
     return history, model
 
-def evaluate_classification(model, test_ds) :
+def evaluate(model, test_ds) :
     print(model.evaluate(test_ds))
 
 
 
-def main_classification() :
+def main() :
 
     train_ds, val_ds, test_ds = preprocess()
     history, model = train(train_ds, val_ds)
     evaluate(model, test_ds)
+
+
+
+
+
+
+
+
+
+#============= SEGMENTATION ===============================
+
+
+
+def preprocess_seg2D():
+
+    df = load_path_seg_df(DATA_DIR_SEG)
+    # --- 2. SÉPARATION DES DONNÉES (TRAIN / VAL / TEST) ---
+    # On divise d'abord en : 85% (Train+Val) et 15% (Test final)
+    train_val_df, test_df = train_test_split(df, test_size=0.15, random_state=42)
+
+    # On recoupe les 85% restants en : 85% Train et 15% Validation
+    train_df, val_df = train_test_split(train_val_df, test_size=0.15, random_state=42)
+
+    train_gen_color = ColorContrastDataGenerator(train_df, batch_size=BATCH_SIZE, img_size=IMG_SIZE)
+    val_gen_color = ColorContrastDataGenerator(val_df, batch_size=BATCH_SIZE, img_size=IMG_SIZE)
+    test_gen_color = ColorContrastDataGenerator(test_df, batch_size=BATCH_SIZE, img_size=IMG_SIZE, shuffle=False)
+
+    return (train_gen_color, val_gen_color, test_gen_color)
+
+
+
+
+def train_seg2D(model, train_gen_color, val_gen_color) :
+
+
+    model = init_model_seg2D(IMG_SIZE, IMG_SIZE, 3)
+    model = compile_model_seg2D(model)
+
+    unet_callbacks = [
+    # 1. EarlyStopping (Arrêt Précoce)
+    # Patiente 10 pour laisser le temps au modèle de dépasser les petits plateaux.
+    tf.keras.callbacks.EarlyStopping(
+        monitor='val_loss',
+        patience=10,
+        verbose=1,
+        restore_best_weights=True
+    ),
+
+    # 2. ReduceLROnPlateau (Ralentissement de l'apprentissage)
+    # Si la perte stagne pendant 5 époques, on ralentit pour forcer l'ajustement fin.
+    tf.keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.2,           # Diviser le Learning Rate par 5
+        patience=5,
+        min_lr=1e-6,          # Vitesse minimale de sécurité
+        verbose=1
+    ),
+
+    # 3. ModelCheckpoint (Sauvegarde du meilleur modèle)
+    # Sauvegarde uniquement si le Dice Score de validation s'améliore.
+    tf.keras.callbacks.ModelCheckpoint(
+        'unet_final_best.keras',
+        monitor='val_dice_coef',
+        save_best_only=True,
+        mode='max',
+        verbose=1
+    )
+]
+
+    history = model.fit(
+    train_gen_color,
+    validation_data=val_gen_color,
+    epochs=2, # On augmente car le modèle est plus gros
+    callbacks=unet_callbacks,
+    verbose=1
+)
+    return (history, model)
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     try:

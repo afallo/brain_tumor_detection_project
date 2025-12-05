@@ -21,3 +21,7 @@ BATCH_SIZE = 16
 LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "training_outputs")
 MODEL_TARGET = "local"
 BUCKET_NAME = "bucket_name"
+
+
+DATA_DIR_SEG = '../../raw_data/segmentation/kaggle_3m'
+IMG_SIZE = 256

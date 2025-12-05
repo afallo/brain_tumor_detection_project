@@ -4,21 +4,39 @@ reinstall_package:
 	@pip uninstall -y brain || :
 	@pip install -e .
 
-run_preprocess:
+run_preprocess_classification:
 	python -c 'from brain.interface.main import preprocess_classification; preprocess_classification()'
 
-run_train:
+run_train_classification:
 	python -c 'from brain.interface.main import train_classification; train_classification()'
 
 #run_pred:
 #	python -c 'from brain.interface.main import pred; pred()'
 
-run_evaluate:
+run_evaluate_classification:
 	python -c 'from brain.interface.main import evaluate_classification; evaluate_classification()'
 
 # run_all: run_preprocess run_train run_pred run_evaluate
-run_all:
+run_all_classification:
 	python -c 'from brain.interface.main import main_classification; main_classification()'
+
+
+run_preprocess_seg2D:
+	python -c 'from brain.interface.main import preprocess_classification; preprocess_classification()'
+
+run_train_seg2D:
+	python -c 'from brain.interface.main import train_classification; train_classification()'
+
+#run_pred:
+#	python -c 'from brain.interface.main import pred; pred()'
+
+run_evaluate_seg2D:
+	python -c 'from brain.interface.main import evaluate_seg2D; evaluate_seg2D()'
+
+# run_all: run_preprocess run_train run_pred run_evaluate
+run_all_seg2D:
+	python -c 'from brain.interface.main import main_classification; main_classification()'
+
 
 
 run_api:
