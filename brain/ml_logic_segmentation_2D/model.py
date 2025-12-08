@@ -1,12 +1,16 @@
 import os
 import datetime
 import matplotlib.pyplot as plt
+import random
+import cv2
+import numpy as np
 
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Conv2DTranspose, BatchNormalization, Dropout, Lambda
 from tensorflow.keras.optimizers import Adam
+
+
 
 from brain.ml_logic_segmentation_2D.metrics import dice_coef, dice_coef_loss
 
@@ -92,55 +96,15 @@ def init_model_seg2D(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS):
 #===========================================================================
 
 def compile_model_seg2D(model) :
-    model.compile(optimizer=Adam(learning_rate=1e-3),
+    model.compile(optimizer=Adam(learning_rate=1e-4),
                          loss=dice_coef_loss,
                          metrics=['accuracy', dice_coef])
+    return model
 
 
 #===========================================================================
 
 
-def train_seg2D(model, train_gen_color) :
-
-    unet_callbacks = [
-    # 1. EarlyStopping (Arrêt Précoce)
-    # Patiente 10 pour laisser le temps au modèle de dépasser les petits plateaux.
-    tf.keras.callbacks.EarlyStopping(
-        monitor='val_loss',
-        patience=10,
-        verbose=1,
-        restore_best_weights=True
-    ),
-
-    # 2. ReduceLROnPlateau (Ralentissement de l'apprentissage)
-    # Si la perte stagne pendant 5 époques, on ralentit pour forcer l'ajustement fin.
-    tf.keras.callbacks.ReduceLROnPlateau(
-        monitor='val_loss',
-        factor=0.2,           # Diviser le Learning Rate par 5
-        patience=5,
-        min_lr=1e-6,          # Vitesse minimale de sécurité
-        verbose=1
-    ),
-
-    # 3. ModelCheckpoint (Sauvegarde du meilleur modèle)
-    # Sauvegarde uniquement si le Dice Score de validation s'améliore.
-    tf.keras.callbacks.ModelCheckpoint(
-        'unet_final_best.keras',
-        monitor='val_dice_coef',
-        save_best_only=True,
-        mode='max',
-        verbose=1
-    )
-]
-
-    history = model.fit(
-    train_gen_color,
-    validation_data=val_gen_color,
-    epochs=50, # On augmente car le modèle est plus gros
-    callbacks=unet_callbacks,
-    verbose=1
-)
-    return (history, model)
 
 
 #===========================================================================
@@ -206,7 +170,7 @@ def predict_and_plot_seg2D(model, df, n_samples=3):
 
     plt.tight_layout()
    # --- SAUVEGARDE ---
-    output_dir = "../../predicted_data/seg2D"
+    output_dir = "predicted_data/seg2D"
     os.makedirs(output_dir, exist_ok=True)  # crée le dossier si besoin
 
     # Date du jour au format AAAA-MM-JJ

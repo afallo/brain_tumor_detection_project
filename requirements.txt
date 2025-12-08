@@ -33,3 +33,4 @@ tensorflow==2.10.0; sys_platform != 'darwin' # Windows & Ubuntu Intel chips
 pillow==12.0.0
 uvicorn
 fastapi
+python-multipart

@@ -9,6 +9,8 @@ def create_diagnosed_dataframe(data_dir):
 
     print("🕵️‍♂️ Analyse et vérification des fichiers en cours...")
 
+
+
     for dirname, _, filenames in os.walk(data_dir):
         for filename in filenames:
             if 'mask' in filename and filename.endswith('.tif'):
@@ -23,6 +25,7 @@ def create_diagnosed_dataframe(data_dir):
                     # 2. Vérification de contenu : Le masque est-il vide ?
                     # On lit le masque en niveau de gris (0 = noir, 255 = blanc)
                     try:
+
                         mask_img = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
 
                         # Si la valeur max est > 0, c'est qu'il y a une tumeur (du blanc)
@@ -60,6 +63,7 @@ def balance_dataset(df):
     # 3. On recombine et on mélange
     df_balanced = pd.concat([df_tumor, df_healthy_sampled])
     df_balanced = df_balanced.sample(frac=1, random_state=42).reset_index(drop=True)
+
 
     return df_balanced
 
