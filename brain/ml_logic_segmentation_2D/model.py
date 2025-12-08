@@ -9,6 +9,7 @@ from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Conv2DTranspose, BatchNormalization, Dropout, Lambda
 from tensorflow.keras.optimizers import Adam
+import tensorflow_addons as tfa
 
 
 
@@ -96,7 +97,8 @@ def init_model_seg2D(IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS):
 #===========================================================================
 
 def compile_model_seg2D(model) :
-    model.compile(optimizer=Adam(learning_rate=1e-4),
+   # model.compile(optimizer=AdamW(learning_rate=1e-3),
+    model.compile(optimizer=tfa.optimizers.AdamW(learning_rate=1e-4, weight_decay=1e-5),
                          loss=dice_coef_loss,
                          metrics=['accuracy', dice_coef])
     return model
