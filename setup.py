@@ -6,8 +6,8 @@ with open("requirements.txt") as f:
 requirements = [x.strip() for x in content if "git+" not in x]
 
 setup(name='brain',
-      version="0.0.0",
-      description="Brain categorical classification model",
+      version="0.0.1",
+      description="Brain categorical classification model + segmentation 2D",
       license="MIT",
       author="Le Wagon brainers",
       author_email="contact@lewagon.org",
