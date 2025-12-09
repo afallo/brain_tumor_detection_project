@@ -73,3 +73,41 @@ class ColorContrastDataGenerator(tf.keras.utils.Sequence):
     def on_epoch_end(self):
         if self.shuffle:
             np.random.shuffle(self.indices)
+
+
+
+def preprocess_loaded_image_for_inference(img, img_size=256):
+    """
+    Applique le même préprocessing que ColorContrastDataGenerator à une image déjà chargée.
+
+    Args:
+        img (np.ndarray): Image chargée (format BGR, comme OpenCV).
+        img_size (int): Taille de sortie de l'image (carrée).
+
+    Returns:
+        np.ndarray: Image préprocessée, normalisée, redimensionnée et prête pour model.predict.
+    """
+    # Initialisation du CLAHE (mêmes paramètres que dans le DataGenerator)
+    clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8))
+
+    # 1. Conversion BGR -> LAB
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+
+    # 2. Séparation des canaux
+    l, a, b = cv2.split(lab)
+
+    # 3. Application du CLAHE sur la luminance (L)
+    l2 = clahe.apply(l)
+
+    # 4. Fusion et retour en BGR
+    lab = cv2.merge((l2, a, b))
+    img = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
+
+    # 5. Redimensionnement et normalisation
+    img = cv2.resize(img, (img_size, img_size))
+    img = img / 255.0  # Normalisation [0, 1]
+
+    # 6. Ajout d'une dimension batch (nécessaire pour model.predict)
+    img = np.expand_dims(img, axis=0)
+
+    return img
