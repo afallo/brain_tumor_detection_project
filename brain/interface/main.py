@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 from brain.params import *
-from brain.registry import load_model, save_results, save_model, save_model_seg2D
+from brain.registry import load_model, save_results, save_model, save_model_seg2D, save_data_gcs
 
 from brain.ml_logic_classification.data import load_path_label_df
 from brain.ml_logic_classification.encoders import tumor_encoded
@@ -229,6 +229,10 @@ def preprocess_seg3D():
 
         img, seg = process_case(case_dir)
         np.savez_compressed(out_path, image=img, label=seg)
+        if DATA_TARGET == "gcs" :
+            destination_blob_name = f"segmentation_3D/processed_data/{case_id}.npz"
+            save_data_gcs(BUCKET_NAME, destination_blob_name, out_path, from_file=True)
+            os.remove(out_path)
         print("Saved", out_path)
 
     return None

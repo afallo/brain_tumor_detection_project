@@ -2,6 +2,8 @@ import glob
 import os
 import time
 import pickle
+from google.cloud import storage
+import io
 
 from brain.params import *
 
@@ -203,3 +205,43 @@ def load_model_seg2D() -> keras.Model:
             print(f"\n❌ No model found in GCS bucket {BUCKET_NAME}")
 
             return None
+
+
+
+def save_data_gcs(bucket_name, destination_blob_name, data, from_file=False) :
+    """
+    Upload n'importe quel type de données vers un bucket GCS.
+
+    Args:
+        bucket_name (str): Nom du bucket GCS
+        destination_blob_name (str): Nom du fichier dans le bucket
+        data: Les données à uploader (str, bytes, chemin de fichier, ou file-like object)
+        from_file (bool): True si 'data' est un chemin de fichier local
+    """
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+
+
+    if from_file:
+        # Cas 1 : upload depuis un fichier local
+        blob.upload_from_filename(data)
+    elif isinstance(data, bytes):
+        # Cas 2 : upload depuis des bytes
+        blob.upload_from_string(data)
+    elif isinstance(data, str):
+        try:
+            # Cas 3a : upload depuis une chaîne de texte
+            blob.upload_from_string(data)
+        except Exception:
+            # Cas 3b : si c'est un chemin de fichier déguisé
+            blob.upload_from_filename(data)
+    elif isinstance(data, io.IOBase):
+        # Cas 4 : upload depuis un flux (file-like object)
+        blob.upload_from_file(data)
+    else:
+        raise TypeError("Type de données non supporté. Utilise str, bytes, fichier ou flux.")
+
+    print(f"✅ Données uploadées dans {bucket_name}/{destination_blob_name}")
+
+    return None
