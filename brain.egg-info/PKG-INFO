@@ -26,13 +26,13 @@ Requires-Dist: scipy>=1.12.0
 Requires-Dist: google-cloud-bigquery
 Requires-Dist: google-cloud-storage==2.14.0
 Requires-Dist: google-api-core==2.8.2
-Requires-Dist: googleapis-common-protos==1.56.4
-Requires-Dist: protobuf==3.19.6
-Requires-Dist: h5py==3.10.0
+Requires-Dist: googleapis-common-protos
+Requires-Dist: protobuf
+Requires-Dist: h5py
 Requires-Dist: db-dtypes
 Requires-Dist: pyarrow
-Requires-Dist: tensorflow-macos==2.10.0; sys_platform == "darwin" and "ARM" in platform_version
-Requires-Dist: tensorflow==2.10.0; sys_platform == "darwin" and "ARM" not in platform_version
+Requires-Dist: tensorflow-macos==2.19.0; sys_platform == "darwin" and "ARM" in platform_version
+Requires-Dist: tensorflow==2.19.0; sys_platform == "darwin" and "ARM" not in platform_version
 Requires-Dist: pillow==12.0.0
 Requires-Dist: uvicorn
 Requires-Dist: fastapi

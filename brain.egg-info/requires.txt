@@ -19,9 +19,9 @@ scipy>=1.12.0
 google-cloud-bigquery
 google-cloud-storage==2.14.0
 google-api-core==2.8.2
-googleapis-common-protos==1.56.4
-protobuf==3.19.6
-h5py==3.10.0
+googleapis-common-protos
+protobuf
+h5py
 db-dtypes
 pyarrow
 pillow==12.0.0
@@ -32,7 +32,7 @@ tensorflow-addons
 nibabel
 
 [:sys_platform == "darwin" and "ARM" in platform_version]
-tensorflow-macos==2.10.0
+tensorflow-macos==2.19.0
 
 [:sys_platform == "darwin" and "ARM" not in platform_version]
-tensorflow==2.10.0
+tensorflow==2.19.0

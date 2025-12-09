@@ -38,7 +38,7 @@ BUCKET_NAME = "bucket_name"
 
 DATA_DIR_SEG = '/home/aurore/code/afallo/brain_tumor_detection_project/raw_data/segmentation/kaggle_3m/'
 IMG_SIZE = 256
-EPOCHS_SEG2D = 10
+EPOCHS_SEG2D = 3
 
 #----- SEG3D ------
 
