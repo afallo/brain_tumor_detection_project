@@ -1,19 +1,30 @@
 import pandas as pd
 import numpy as np
-from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+import matplotlib.pyplot as plt
 
 
 from brain.params import *
-from brain.ml_logic.data import load_path_label_df
-from brain.ml_logic.encoders import tumor_encoded
-from brain.ml_logic.utils import find_and_erase_duplicates
-from brain.ml_logic.preprocess import load_process_image, pipeline_building
-from brain.ml_logic.model import init_model, compile_model
+from brain.registry import load_model, save_results, save_model, save_model_seg2D
+
+from brain.ml_logic_classification.data import load_path_label_df
+from brain.ml_logic_classification.encoders import tumor_encoded
+from brain.ml_logic_classification.utils import find_and_erase_duplicates
+from brain.ml_logic_classification.preprocess import pipeline_building
+from brain.ml_logic_classification.model import compile_model_classification, init_densenet_classification
+
+from brain.ml_logic_segmentation_2D.data import load_path_seg_df
+from brain.ml_logic_segmentation_2D.utils import find_and_erase_duplicates
+from brain.ml_logic_segmentation_2D.preprocess import ColorContrastDataGenerator
+from brain.ml_logic_segmentation_2D.model import compile_model_seg2D, init_model_seg2D, predict_and_plot_seg2D
 
 
 
-def preprocess() :
+#============= CLASSIFICATION===============================
+def preprocess_classification() :
+
+    find_and_erase_duplicates()
 
     training_df = load_path_label_df(TRAIN_DIR)
     testing_df = load_path_label_df(TEST_DIR)
@@ -35,7 +46,7 @@ def preprocess() :
     return (train_ds, val_ds, test_ds)
 
 
-def train(train_ds, val_ds) :
+def train_classification(train_ds, val_ds) :
 
 
     all_labels = []
@@ -44,32 +55,169 @@ def train(train_ds, val_ds) :
 
     n_classes = len(np.unique(all_labels))
     input_shape = (TARGET_SIZE[0], TARGET_SIZE[1], 3)
-    model = init_model(input_shape, n_classes)
-    model = compile_model(model)
+    model = init_densenet_classification(input_shape, n_classes)
+    model = compile_model_classification(model)
 
     es = [EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)]
 
     history = model.fit(train_ds,
                         validation_data=val_ds,
-                        epochs=10,
+                        epochs=EPOCHS_CLASS,
                         callbacks=es)
+
+
+    accuracy  = np.min(history.history['val_accuracy'])
+
+
+
+
+    save_results(metrics=dict(accuracy = accuracy))
+    save_model(model=model)
 
     return history, model
 
-def evaluate(model, test_ds) :
+def evaluate_classification(model, test_ds) :
     print(model.evaluate(test_ds))
 
-def main() :
 
-    train_ds, val_ds, test_ds = preprocess()
-    history, model = train(train_ds, val_ds)
-    evaluate(model, test_ds)
+
+def main_classification() :
+
+    train_ds, val_ds, test_ds = preprocess_classification()
+    history, model = train_classification(train_ds, val_ds)
+    evaluate_classification(model, test_ds)
+
+
+
+
+
+
+
+
+
+#============= SEGMENTATION ===============================
+
+
+
+def preprocess_seg2D():
+
+    df = load_path_seg_df(DATA_DIR_SEG)
+
+    # --- 2. SÉPARATION DES DONNÉES (TRAIN / VAL / TEST) ---
+    # On divise d'abord en : 85% (Train+Val) et 15% (Test final)
+    train_val_df, test_df = train_test_split(df, test_size=0.15, random_state=42)
+
+    # On recoupe les 85% restants en : 85% Train et 15% Validation
+    train_df, val_df = train_test_split(train_val_df, test_size=0.15, random_state=42)
+
+    train_gen_color = ColorContrastDataGenerator(train_df, batch_size=BATCH_SIZE, img_size=IMG_SIZE)
+    val_gen_color = ColorContrastDataGenerator(val_df, batch_size=BATCH_SIZE, img_size=IMG_SIZE)
+    test_gen_color = ColorContrastDataGenerator(test_df, batch_size=BATCH_SIZE, img_size=IMG_SIZE, shuffle=False)
+
+    # X_batch, y_batch = train_gen_color[0]   # le premier batch
+
+    # # Afficher quelques images + masques
+    # n = 5
+    # plt.figure(figsize=(12, 6))
+    # for i in range(n):
+    #     plt.subplot(2, n, i+1)
+    #     plt.imshow(X_batch[i])   # image couleur normalisée
+    #     plt.axis("off")
+    #     plt.title("Image")
+
+    #     plt.subplot(2, n, i+1+n)
+    #     plt.imshow(y_batch[i].squeeze(), cmap="gray")  # masque binaire
+    #     plt.axis("off")
+    #     plt.title("Masque")
+    # plt.tight_layout()
+    # plt.show()
+
+
+    return (train_gen_color, val_gen_color, test_gen_color)
+
+
+
+
+def train_seg2D(train_gen_color, val_gen_color) :
+
+
+    model = init_model_seg2D(IMG_SIZE, IMG_SIZE, 3)
+    model= compile_model_seg2D(model)
+
+    unet_callbacks = [
+    # 1. EarlyStopping (Arrêt Précoce)
+    # Patiente 10 pour laisser le temps au modèle de dépasser les petits plateaux.
+    tf.keras.callbacks.EarlyStopping(
+        monitor='val_loss',
+        patience=10,
+        verbose=1,
+        restore_best_weights=True
+    ),
+
+    # 2. ReduceLROnPlateau (Ralentissement de l'apprentissage)
+    # Si la perte stagne pendant 5 époques, on ralentit pour forcer l'ajustement fin.
+    tf.keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.2,           # Diviser le Learning Rate par 5
+        patience=5,
+        min_lr=1e-6,          # Vitesse minimale de sécurité
+        verbose=1
+    )
+
+
+    # 3. ModelCheckpoint (Sauvegarde du meilleur modèle)
+    # Sauvegarde uniquement si le Dice Score de validation s'améliore.
+   # tf.keras.callbacks.ModelCheckpoint(
+    #    'unet_final_best.keras',
+    #    monitor='val_dice_coef',
+    #    save_best_only=True,
+    #   mode='max',
+    #    verbose=1
+    #)
+]
+
+
+    history = model.fit(
+    train_gen_color,
+    validation_data=val_gen_color,
+    epochs=EPOCHS_SEG2D, # On augmente car le modèle est plus gros
+    callbacks=unet_callbacks,
+    verbose=1
+)
+    #accuracy  = np.min(history.history['val_accuracy'])
+
+    #save_results(metrics=dict(accuracy = accuracy))
+    save_model_seg2D(model=model)
+
+    return (history, model)
+
+
+
+def evaluate_seg2D(model, test_gen_color) :
+    print(model.evaluate(test_gen_color))
+
+
+
+def main_seg2D() :
+
+    train_ds, val_ds, test_ds = preprocess_seg2D()
+    history, model = train_seg2D(train_ds, val_ds)
+    evaluate_seg2D(model, test_ds)
+
+    df = load_path_seg_df(DATA_DIR_SEG)
+    # --- 2. SÉPARATION DES DONNÉES (TRAIN / VAL / TEST) ---
+    # On divise d'abord en : 85% (Train+Val) et 15% (Test final)
+    train_val_df, test_df = train_test_split(df, test_size=0.15, random_state=42)
+    predict_and_plot_seg2D(model, test_df, n_samples=3)
+
+
+
+
 
 if __name__ == '__main__':
     try:
-        preprocess()
-        train()
-        pred()
+        preprocess_classification()
+
     except:
         import sys
         import traceback
