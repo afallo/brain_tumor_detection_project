@@ -6,6 +6,7 @@ from google.cloud import storage
 import io
 
 from brain.params import *
+from brain.ml_logic_segmentation_2D.metrics import dice_coef, dice_coef_loss
 
 from colorama import Fore, Style
 from tensorflow import keras
@@ -178,7 +179,13 @@ def load_model_seg2D() -> keras.Model:
 
         print(Fore.BLUE + f"\nLoad latest model from disk..." + Style.RESET_ALL)
 
-        latest_model = keras.models.load_model(most_recent_model_path_on_disk)
+        latest_model = keras.models.load_model(
+            most_recent_model_path_on_disk,
+            custom_objects={
+            'dice_coef_loss': dice_coef_loss,  # Fonction de perte
+            'dice_coef': dice_coef             # Métrique personnalisée
+            }
+        )
 
         print("✅ Model loaded from local disk")
 
