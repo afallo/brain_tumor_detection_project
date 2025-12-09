@@ -39,6 +39,8 @@ Requires-Dist: pillow==12.0.0
 Requires-Dist: uvicorn
 Requires-Dist: fastapi
 Requires-Dist: python-multipart
+Requires-Dist: tensorflow-addons
+Requires-Dist: nibabel
 Dynamic: author
 Dynamic: author-email
 Dynamic: license

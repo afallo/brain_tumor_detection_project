@@ -27,10 +27,10 @@ run_all_classification:
 
 
 run_preprocess_seg2D:
-	python -c 'from brain.interface.main import run_preprocess_seg2D; run_preprocess_seg2D()'
+	python -c 'from brain.interface.main import preprocess_seg2D; preprocess_seg2D()'
 
 run_train_seg2D:
-	python -c 'from brain.interface.main import run_train_seg2D; run_train_seg2D()'
+	python -c 'from brain.interface.main import train_seg2D; train_seg2D()'
 
 #run_pred:
 #	python -c 'from brain.interface.main import pred; pred()'
@@ -42,6 +42,10 @@ run_evaluate_seg2D:
 run_all_seg2D:
 	python -c 'from brain.interface.main import main_seg2D; main_seg2D()'
 
+
+
+run_preprocess_seg3D:
+	python -c 'from brain.interface.main import preprocess_seg3D; preprocess_seg3D()'
 
 
 run_api:

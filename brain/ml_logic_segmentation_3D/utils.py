@@ -1,15 +1,6 @@
-from pathlib import Path
 import hashlib
 import os
-
-# --- Paramètres à adapter ---
-DATASET_ROOT = Path("dataset")  # dossier racine contenant Training/ et Testing/
-CLASSES = ["glioma", "pituitary", "meningioma", "notumor"]
-SPLITS_ORDER = ["Training", "Testing"]  # Priorité : on garde ce qu'on voit en premier
-EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp")  # adapte si besoin
-DRY_RUN = True  # Mettre False pour réellement supprimer les fichiers
-# ----------------------------
-
+from brain.params import *
 
 def file_hash(path, algo="md5", block_size=65536):
     """Hash du fichier basé sur son contenu (rapide et robuste pour duplicats exacts)."""
@@ -58,7 +49,7 @@ def find_duplicates(paths):
     return hash_to_files, duplicates_groups
 
 
-def main():
+def find_and_erase_duplicates():
     print("🔍 Listing des images...")
     all_paths = list_all_images()
     print(f"Total d'images trouvées : {len(all_paths)}")
@@ -100,7 +91,3 @@ def main():
                 print(f"Erreur en supprimant {f}: {e}")
 
     print(f"✅ Suppression terminée. Fichiers supprimés : {deleted}")
-
-
-if __name__ == "__main__":
-    main()

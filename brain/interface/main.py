@@ -19,7 +19,7 @@ from brain.ml_logic_segmentation_2D.utils import find_and_erase_duplicates
 from brain.ml_logic_segmentation_2D.preprocess import ColorContrastDataGenerator
 from brain.ml_logic_segmentation_2D.model import compile_model_seg2D, init_model_seg2D, predict_and_plot_seg2D
 
-
+from brain.ml_logic_segmentation_3D.preprocess import process_case
 
 #============= CLASSIFICATION===============================
 def preprocess_classification() :
@@ -95,7 +95,7 @@ def main_classification() :
 
 
 
-#============= SEGMENTATION ===============================
+#============= SEGMENTATION 2D ===============================
 
 
 
@@ -211,6 +211,27 @@ def main_seg2D() :
     predict_and_plot_seg2D(model, test_df, n_samples=3)
 
 
+
+
+
+#============= SEGMENTATION 3D ===============================
+
+
+
+def preprocess_seg3D():
+
+    OUT_ROOT_3D.mkdir(parents=True, exist_ok=True)
+    case_dirs = sorted([p for p in RAW_ROOT_3D.iterdir() if p.is_dir()])
+
+    for case_dir in case_dirs:
+        case_id = case_dir.name  # ex: BraTS-GLI-00000-000
+        out_path = OUT_ROOT_3D / f"{case_id}.npz"
+
+        img, seg = process_case(case_dir)
+        np.savez_compressed(out_path, image=img, label=seg)
+        print("Saved", out_path)
+
+    return None
 
 
 

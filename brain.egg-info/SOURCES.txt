@@ -1,7 +1,6 @@
 README.md
 setup.py
 brain/__init__.py
-brain/dedup_tumors.py
 brain/params.py
 brain/registry.py
 brain.egg-info/PKG-INFO
@@ -24,3 +23,9 @@ brain/ml_logic_segmentation_2D/metrics.py
 brain/ml_logic_segmentation_2D/model.py
 brain/ml_logic_segmentation_2D/preprocess.py
 brain/ml_logic_segmentation_2D/utils.py
+brain/ml_logic_segmentation_3D/__init__.py
+brain/ml_logic_segmentation_3D/data.py
+brain/ml_logic_segmentation_3D/metrics.py
+brain/ml_logic_segmentation_3D/model.py
+brain/ml_logic_segmentation_3D/preprocess.py
+brain/ml_logic_segmentation_3D/utils.py
