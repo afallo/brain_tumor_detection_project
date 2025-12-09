@@ -13,28 +13,31 @@ from brain.ml_logic_segmentation_2D.metrics import dice_coef, dice_coef_loss
 app = FastAPI()
 
 
-
-
-
 @app.get("/")
 def read_root():
     return {"message": "Hello brainers"}
 
 @app.post("/predict_classification")
 async def predict_class(file: UploadFile = File(...)):
-    # Lire l'image
-    model = load_model()
+    try:
+        # Read the uploaded file (FastAPI gives you a SpooledTemporaryFile)
+        img = Image.open(file.file).convert("RGB")
 
-    img = Image.open(file.file).convert("RGB")
+        # Preprocess for your classification model
+        img_array = preprocess_for_inference(img)
 
-    img_array = preprocess_for_inference(img)
-      # Prédiction
+        # Load model INSIDE the endpoint (safe for now; we can optimize later)
+        model = load_model()
 
-    preds = model.predict(img_array)
+        # Predict
+        preds = model.predict(img_array)
+        predicted_class = int(np.argmax(preds))
 
-    predicted_class = int(np.argmax(preds))
+        return {"class": predicted_class, "scores": preds.tolist()}
 
-    return {"class": predicted_class, "scores": preds.tolist()}
+    except Exception as e:
+        # This avoids a totally opaque "Internal Server Error"
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {e}")
 
 
 
