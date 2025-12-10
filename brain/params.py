@@ -21,8 +21,8 @@ EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp")  # adapte si besoin
 DRY_RUN = True  # Mettre False pour réellement supprimer les fichiers
 
 
-TRAIN_DIR = Path("/Users/abirbou/code/afallo/brain_tumor_detection_project/raw_data/classification/Training")
-TEST_DIR = Path("/Users/abirbou/code/afallo/brain_tumor_detection_project/raw_data/classification/Testing")
+TRAIN_DIR = Path("/Users/abirbou/code/afallo/brain_tumor_detection_project/raw_data/classification/BRISC/train")
+TEST_DIR = Path("/Users/abirbou/code/afallo/brain_tumor_detection_project/raw_data/classification/BRISC/test")
 
 TARGET_SIZE = (224,224)
 AUTOTUNE = tf.data.AUTOTUNE
