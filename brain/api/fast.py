@@ -5,7 +5,7 @@ import uvicorn
 import numpy as np
 from PIL import Image
 from brain.params import *
-from brain.registry import load_model, load_model_seg2D
+from brain.registry import load_model, load_model_seg2D, load_model_docker
 from brain.ml_logic_classification.preprocess import preprocess_for_inference
 from brain.ml_logic_segmentation_2D.preprocess import preprocess_loaded_image_for_inference
 from brain.ml_logic_segmentation_2D.metrics import dice_coef, dice_coef_loss
@@ -23,7 +23,7 @@ def read_root():
 @app.post("/predict_classification")
 async def predict_class(file: UploadFile = File(...)):
     # Lire l'image
-    model = load_model()
+    model = load_model_docker("models/classification.h5")
 
     img = Image.open(file.file).convert("RGB")
 
@@ -42,7 +42,7 @@ async def predict_class(file: UploadFile = File(...)):
 async def predict_seg2D(file: UploadFile = File(...)):
     # Lire l'image
 
-    model = load_model_seg2D()
+    model = load_model_docker("models/seg2D.h5")
 
     img = Image.open(file.file).convert("RGB")
     img_np = np.array(img)

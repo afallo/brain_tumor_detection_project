@@ -213,6 +213,27 @@ def load_model_seg2D() -> keras.Model:
 
             return None
 
+def load_model_docker(path_model) -> keras.Model:
+    """
+    Return a saved model:
+    - locally (latest one in alphabetical order)
+    - or from GCS (most recent one) if MODEL_TARGET=='gcs'  --> for unit 02 only
+    - or from MLFLOW (by "stage") if MODEL_TARGET=='mlflow' --> for unit 03 only
+
+    Return None (but do not Raise) if no model is found
+
+    """
+    latest_model = keras.models.load_model(
+            path_model,
+            custom_objects={
+            'dice_coef_loss': dice_coef_loss,  # Fonction de perte
+            'dice_coef': dice_coef             # Métrique personnalisée
+            }
+        )
+
+    print("✅ Model loaded from local disk")
+
+    return latest_model
 
 
 def save_data_gcs(bucket_name, destination_blob_name, data, from_file=False) :

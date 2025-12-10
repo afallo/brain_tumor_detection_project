@@ -4,7 +4,7 @@ import tensorflow as tf
 
 
 MODEL_TARGET = "local"
-DATA_TARGET = "local"
+DATA_TARGET = "gcs"
 
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 GCP_PROJECT= os.environ.get("GCP_PROJECT")
@@ -26,9 +26,9 @@ TEST_DIR = Path("/home/aurore/code/afallo/brain_tumor_detection_project/raw_data
 
 TARGET_SIZE = (224,224)
 AUTOTUNE = tf.data.AUTOTUNE
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 
-EPOCHS_CLASS = 20
+EPOCHS_CLASS = 2
 
 # --- SEG2D ---
 LOCAL_REGISTRY_PATH =  os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "training_outputs")
@@ -38,7 +38,7 @@ BUCKET_NAME = "bucket_name"
 
 DATA_DIR_SEG = '/home/aurore/code/afallo/brain_tumor_detection_project/raw_data/segmentation/kaggle_3m/'
 IMG_SIZE = 256
-EPOCHS_SEG2D = 3
+EPOCHS_SEG2D = 50
 
 #----- SEG3D ------
 
