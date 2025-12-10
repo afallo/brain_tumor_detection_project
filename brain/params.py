@@ -36,14 +36,14 @@ MODEL_TARGET = "local"
 BUCKET_NAME = "bucket_name"
 
 
-DATA_DIR_SEG = '../../raw_data/segmentation/kaggle_3m/'
+DATA_DIR_SEG = '../../../raw_data/segmentation/kaggle_3m/'
 IMG_SIZE = 256
 EPOCHS_SEG2D = 3
 
 #----- SEG3D ------
 
-RAW_ROOT_3D = Path("../../raw_data/segmentation/brats2023_raw")
-OUT_ROOT_3D = Path("../../raw_data/segmentation/brats2023_preprocessed")
+RAW_ROOT_3D = Path("../../../raw_data/segmentation/brats2023_raw")
+OUT_ROOT_3D = Path("../../../raw_data/segmentation/brats2023_preprocessed")
 
 
 # Taille cible
