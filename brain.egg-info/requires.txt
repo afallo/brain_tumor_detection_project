@@ -32,7 +32,7 @@ tensorflow-addons
 nibabel
 
 [:sys_platform == "darwin" and "ARM" in platform_version]
-tensorflow-macos==2.19.0
+tensorflow==2.19.0
 
 [:sys_platform == "darwin" and "ARM" not in platform_version]
 tensorflow==2.19.0

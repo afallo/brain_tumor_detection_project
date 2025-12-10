@@ -11,7 +11,8 @@ from brain.ml_logic_segmentation_2D.metrics import dice_coef, dice_coef_loss
 from colorama import Fore, Style
 from tensorflow import keras
 from google.cloud import storage
-
+import tensorflow
+from keras.models import load_model
 
 def save_results(metrics: dict) -> None:
     """

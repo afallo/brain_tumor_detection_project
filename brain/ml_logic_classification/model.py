@@ -54,7 +54,6 @@ def init_densenet_classification(input_shape, num_classes):
     return model
 
 def compile_model_classification(model):
-    '''return a compiled model suited for the CIFAR-10 task'''
     model.compile(optimizer= 'adam',
                   loss='sparse_categorical_crossentropy',
                   metrics=["accuracy"])

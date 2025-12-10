@@ -31,7 +31,7 @@ Requires-Dist: protobuf
 Requires-Dist: h5py
 Requires-Dist: db-dtypes
 Requires-Dist: pyarrow
-Requires-Dist: tensorflow-macos==2.19.0; sys_platform == "darwin" and "ARM" in platform_version
+Requires-Dist: tensorflow==2.19.0; sys_platform == "darwin" and "ARM" in platform_version
 Requires-Dist: tensorflow==2.19.0; sys_platform == "darwin" and "ARM" not in platform_version
 Requires-Dist: pillow==12.0.0
 Requires-Dist: uvicorn

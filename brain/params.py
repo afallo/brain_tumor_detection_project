@@ -21,8 +21,8 @@ EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp")  # adapte si besoin
 DRY_RUN = True  # Mettre False pour réellement supprimer les fichiers
 
 
-TRAIN_DIR = Path("/home/aurore/code/afallo/brain_tumor_detection_project/raw_data/classification/Training")
-TEST_DIR = Path("/home/aurore/code/afallo/brain_tumor_detection_project/raw_data/classification/Testing")
+TRAIN_DIR = Path("/Users/abirbou/code/afallo/brain_tumor_detection_project/raw_data/classification/Training")
+TEST_DIR = Path("/Users/abirbou/code/afallo/brain_tumor_detection_project/raw_data/classification/Testing")
 
 TARGET_SIZE = (224,224)
 AUTOTUNE = tf.data.AUTOTUNE
@@ -36,14 +36,14 @@ MODEL_TARGET = "local"
 BUCKET_NAME = "bucket_name"
 
 
-DATA_DIR_SEG = '/home/aurore/code/afallo/brain_tumor_detection_project/raw_data/segmentation/kaggle_3m/'
+DATA_DIR_SEG = '../../raw_data/segmentation/kaggle_3m/'
 IMG_SIZE = 256
 EPOCHS_SEG2D = 3
 
 #----- SEG3D ------
 
-RAW_ROOT_3D = Path("/home/aurore/code/afallo/brain_tumor_detection_project/raw_data/segmentation/brats2023_raw")
-OUT_ROOT_3D = Path("/home/aurore/code/afallo/brain_tumor_detection_project/raw_data/segmentation/brats2023_preprocessed")
+RAW_ROOT_3D = Path("../../raw_data/segmentation/brats2023_raw")
+OUT_ROOT_3D = Path("../../raw_data/segmentation/brats2023_preprocessed")
 
 
 # Taille cible
