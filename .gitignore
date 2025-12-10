@@ -1,5 +1,6 @@
 raw_data/
 predicted_data/
+models/
 
 **/.DS_Store/
 .env
@@ -22,4 +23,3 @@ brain/ml_logic_classification/__pycache__
 brain/ml_logic_segmentation2D/__pycache__
 brain/ml_logic_segmentation3D/__pycache__
 brain/api/__pycache__
-

@@ -23,7 +23,7 @@ def read_root():
 @app.post("/predict_classification")
 async def predict_class(file: UploadFile = File(...)):
     # Lire l'image
-    model = load_model_docker("models/classification.h5")
+    model = load_model_docker("/prod/brain/models/classification.h5")
 
     img = Image.open(file.file).convert("RGB")
 
@@ -42,7 +42,7 @@ async def predict_class(file: UploadFile = File(...)):
 async def predict_seg2D(file: UploadFile = File(...)):
     # Lire l'image
 
-    model = load_model_docker("models/seg2D.h5")
+    model = load_model_docker("/prod/brain/models/seg2D.h5")
 
     img = Image.open(file.file).convert("RGB")
     img_np = np.array(img)
