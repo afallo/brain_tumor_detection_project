@@ -52,4 +52,4 @@ run_api:
 	uvicorn brain.api.fast:app --reload
 
 run_api_local:
-	uvicorn brain.api.fast:app --reload
+	uvicorn brain.api.fast_local:app --reload
